@@ -32,8 +32,6 @@ static void * const kTLYShyNavBarManagerKVOContext = (void*)&kTLYShyNavBarManage
 @property (nonatomic, strong) TLYShyViewController *extensionController;
 @property (nonatomic, strong) TLYShyScrollViewController *scrollViewController;
 
-@property (nonatomic, strong) TLYDelegateProxy *delegateProxy;
-
 @property (nonatomic, strong) UIView *extensionViewContainer;
 
 @property (nonatomic, assign) CGFloat previousYOffset;
@@ -55,8 +53,6 @@ static void * const kTLYShyNavBarManagerKVOContext = (void*)&kTLYShyNavBarManage
     self = [super init];
     if (self)
     {
-        self.delegateProxy = [[TLYDelegateProxy alloc] initWithMiddleMan:self];
-
         /* Initialize defaults */
         self.contracting = NO;
         self.previousContractionState = YES;
@@ -105,12 +101,6 @@ static void * const kTLYShyNavBarManagerKVOContext = (void*)&kTLYShyNavBarManage
 
 - (void)dealloc
 {
-    // sanity check
-    if (_scrollView.delegate == _delegateProxy)
-    {
-        _scrollView.delegate = _delegateProxy.originalDelegate;
-    }
-
     [[NSNotificationCenter defaultCenter] removeObserver:self];
     [_scrollView removeObserver:self forKeyPath:@"contentSize" context:kTLYShyNavBarManagerKVOContext];
 }
@@ -146,11 +136,6 @@ static void * const kTLYShyNavBarManagerKVOContext = (void*)&kTLYShyNavBarManage
 {
     [_scrollView removeObserver:self forKeyPath:@"contentSize" context:kTLYShyNavBarManagerKVOContext];
 
-    if (_scrollView.delegate == self.delegateProxy)
-    {
-        _scrollView.delegate = self.delegateProxy.originalDelegate;
-    }
-
     _scrollView = scrollView;
     self.scrollViewController.scrollView = scrollView;
 
@@ -160,12 +145,6 @@ static void * const kTLYShyNavBarManagerKVOContext = (void*)&kTLYShyNavBarManage
 
     if (index != NSNotFound) {
         self.scrollViewController.refreshControl = [scrollView.subviews objectAtIndex:index];
-    }
-
-    if (_scrollView.delegate != self.delegateProxy)
-    {
-        self.delegateProxy.originalDelegate = _scrollView.delegate;
-        _scrollView.delegate = (id)self.delegateProxy;
     }
 
     [self cleanup];
@@ -196,18 +175,6 @@ static void * const kTLYShyNavBarManagerKVOContext = (void*)&kTLYShyNavBarManage
     if (!disable) {
         self.previousYOffset = self.scrollView.contentOffset.y;
     }
-}
-
-- (void)setHasCustomRefreshControl:(BOOL)hasCustomRefreshControl
-{
-    if (_hasCustomRefreshControl == hasCustomRefreshControl)
-    {
-        return;
-    }
-    
-    _hasCustomRefreshControl = hasCustomRefreshControl;
-    
-    self.scrollViewController.hasCustomRefreshControl = hasCustomRefreshControl;
 }
 
 - (BOOL)stickyNavigationBar

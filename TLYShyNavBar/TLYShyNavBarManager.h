@@ -67,10 +67,6 @@
  */
 @property (nonatomic) TLYShyNavBarFade fadeBehavior;
 
-/* Use this to set if the controller have any kind of custom refresh control
- */
-@property (nonatomic) BOOL hasCustomRefreshControl;
-
 /* Set NO to disable shyNavBar behavior temporarily.
  * Defaults to NO
  */
@@ -79,6 +75,14 @@
 /* Use this to be notified about contraction and expansion events.
  */
 @property (nonatomic, weak) id<TLYShyNavBarManagerDelegate> delegate;
+
+- (void)scrollViewDidScroll:(UIScrollView *)scrollView;
+
+- (void)scrollViewDidEndDragging:(UIScrollView *)scrollView willDecelerate:(BOOL)decelerate;
+
+- (void)scrollViewDidScrollToTop:(UIScrollView *)scrollView;
+
+- (void)scrollViewDidEndDecelerating:(UIScrollView *)scrollView;
 
 @end
 

@@ -32,22 +32,11 @@
     UIEdgeInsets insets = UIEdgeInsetsMake(self.scrollView.contentInset.top, 0, self.scrollView.contentInset.bottom, 0);
     insets.top = normalizedY;
 
-    if (normalizedY > -FLT_EPSILON && !UIEdgeInsetsEqualToEdgeInsets(insets, self.scrollView.contentInset))
-    {
-        CGFloat delta = insets.top - self.scrollView.contentInset.top;
-
-        if (!self.hasCustomRefreshControl && (self.refreshControl == nil || [self.refreshControl isHidden])) {
-            [self.scrollView tly_setInsets:insets];
-        }
-
-        return delta;
-    }
-
-    if (normalizedY < -FLT_EPSILON)
+    if (fabs(normalizedY) > FLT_EPSILON)
     {
         CGRect frame = self.scrollView.frame;
-        frame = UIEdgeInsetsInsetRect(frame, insets);
-
+        frame.origin.y += normalizedY;
+        frame.size.height -= normalizedY;
         self.scrollView.frame = frame;
         return [self updateLayoutIfNeeded];
     }
